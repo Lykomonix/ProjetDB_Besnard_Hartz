@@ -1,0 +1,86 @@
+Voici un travail structuré qui correspond à ce que tu demandes : d’abord les règles de gestion (exprimées du point de vue métier, sans technique), puis un dictionnaire de données brutes qui servira à l’étudiant comme matière première pour modéliser la base.
+
+🔹 Règles de gestion (vue métier)
+
+Une ligne de métro est identifiée par un numéro et un nom (par exemple : « Ligne 1 – La Défense ↔ Château de Vincennes »).
+
+Chaque ligne a un type (métro classique, métro automatique, RER, tramway urbain géré par l’entreprise).
+
+Chaque ligne a des horaires de service (premier départ et dernier départ selon les jours).
+
+Une ligne dessert plusieurs stations, et une station peut appartenir à plusieurs lignes.
+
+Une station est identifiée par un nom et un code interne unique.
+
+Chaque station appartient à une zone tarifaire (exemple : zone 1, zone 2).
+
+Une station peut proposer des équipements (ascenseur, escalator, guichets automatiques, toilettes, bornes d’information, accessibilité PMR).
+
+Une rame de métro est identifiée par un numéro unique.
+
+Chaque rame a une capacité maximale en nombre de voyageurs.
+
+Une rame est affectée à une ligne (même si elle peut changer d’affectation au cours de sa vie).
+
+Les horaires de service définissent la fréquence planifiée des rames sur une ligne donnée.
+
+Pour chaque rame, il existe un planning de passages prévus et des enregistrements des passages réels (heures effectives).
+
+Un écart entre horaire prévu et horaire réel peut être mesuré.
+
+Le trafic voyageur est comptabilisé par station et par période (entrées, sorties, titres de transport utilisés).
+
+Les titres de transport peuvent être variés (ticket, passe Navigo, forfait spécifique, carte bancaire sans contact).
+
+Les rames sont conduites soit par des conducteurs identifiés (avec matricule), soit par un système automatisé.
+
+Chaque incident est enregistré avec une date, une heure, un type (panne technique, accident voyageur, signal d’alarme, mouvement social, etc.), une description et une localisation (ligne/station).
+
+Chaque incident peut donner lieu à un ou plusieurs messages d’information voyageurs diffusés sur différents canaux (affichage en station, annonces sonores, application mobile).
+
+Il existe des correspondances entre lignes, permettant aux voyageurs de passer d’une ligne à une autre dans une station donnée.
+
+Les centres de maintenance sont liés à une ou plusieurs lignes et prennent en charge l’entretien et la réparation des rames ou équipements.
+
+Chaque centre de maintenance est identifié par un nom, un code et une adresse.
+
+🔹 Dictionnaire de données brutes
+Signification de la donnée	Type	Taille
+Numéro de ligne	Numérique	2
+Nom de ligne	Alphanumérique	50
+Type de ligne (classique, automatique, RER…)	Alphanumérique	20
+Premier départ (heure)	Heure	-
+Dernier départ (heure)	Heure	-
+Fréquence planifiée (minutes)	Numérique	2
+Nom de station	Alphanumérique	60
+Code station	Alphanumérique	10
+Zone tarifaire	Numérique	1
+Liste des équipements disponibles	Alphanumérique	200
+Numéro de rame	Numérique	6
+Capacité maximale voyageurs	Numérique	4
+Ligne affectée (numéro)	Numérique	2
+Horaire prévu de passage	Date/Heure	-
+Horaire réel de passage	Date/Heure	-
+Écart prévu/réel (minutes)	Numérique	3
+Volume d’entrées voyageurs (par station/période)	Numérique	6
+Volume de sorties voyageurs (par station/période)	Numérique	6
+Type de titre de transport utilisé	Alphanumérique	30
+Identité conducteur (nom/prénom)	Alphanumérique	60
+Matricule conducteur	Alphanumérique	8
+Mode de conduite (humain/automatisé)	Alphanumérique	15
+Date incident	Date	-
+Heure incident	Heure	-
+Type d’incident	Alphanumérique	30
+Description incident	Alphanumérique	255
+Localisation incident (ligne/station)	Alphanumérique	60
+Code message information voyageurs	Alphanumérique	10
+Contenu du message	Alphanumérique	255
+Canal de diffusion du message	Alphanumérique	30
+Correspondance (ligne/station liée)	Alphanumérique	50
+Nom centre de maintenance	Alphanumérique	60
+Code centre de maintenance	Alphanumérique	10
+Adresse centre de maintenance	Alphanumérique	120
+
+👉 On a ici 33 données, ce qui correspond bien à la fourchette demandée (25–35).
+
+Veux-tu que je poursuive en construisant à partir de ce dictionnaire le Modèle Conceptuel de Données (MCD) en MERISE (entités, associations, cardinalités) pour donner un support graphique et logique à l’étudiant ?
