@@ -1,5 +1,25 @@
-Tu travailles dans le domaine de [A COMPLETER]. Ton [entreprise/organisation/administration] a comme activité de [A COMPLETER]. C’est une [entreprise/organisation/administration] comme [METTRE DES EXEMPLES]. [AJOUTER DES INFORMATIONS SUR CE QUI EST UTILE A METTRE DANS LA BASE]. Inspire-toi [du site web / de la présentation / de l’article] suivant : [A COMPLETER].
-Ton [entreprise/organisation/administration] veut appliquer MERISE pour concevoir un système d'information. Tu es chargé de la partie analyse, c’est-à-dire de collecter les besoins auprès de l’entreprise. Elle a fait appel à un étudiant en ingénierie informatique pour réaliser ce projet, tu dois lui fournir les informations nécessaires pour qu’il applique ensuite lui-même les étapes suivantes de conception et développement de la base de données. 
-D’abord, établis les règles de gestions des données de ton [entreprise/organisation/administration], sous la forme d'une liste à puce. Elle doit correspondre aux informations que fournit quelqu’un qui connaît le fonctionnement de l’entreprise, mais pas comment se construit un système d’informations.
-Ensuite, à partir de ces règles, fournis un dictionnaire de données brutes avec les colonnes suivantes, regroupées dans un tableau : signification de la donnée, type, taille en nombre de caractères ou de chiffres. Il doit y avoir entre 25 et 35 données. Il sert à fournir des informations supplémentaires sur chaque données (taille et type) mais sans a priori sur comment les données vont être modélisées ensuite.
+Tu travailles dans le domaine du transport urbain et de la mobilité.
+Ton entreprise a comme activité de gérer, exploiter et maintenir le réseau de transports publics parisiens, en particulier les lignes de métro, leurs stations, rames et services associés.
+C’est une entreprise de transport en commun comme la RATP ou la SNCF Transilien.
+
+Les informations utiles à mettre dans la base concernent :
+-	Les lignes de métro (numéros, noms, type de ligne, horaires).
+-	Les stations (nom, code, zone tarifaire, équipements disponibles).
+-	Les rames (numéro, capacité, affectation à une ligne).
+-	Les horaires de service (premier et dernier départ, fréquence planifiée).
+-	Les passages réels des rames (heures prévues et heures effectives).
+-	Le trafic voyageur (entrées/sorties par station, titres de transport utilisés).
+-	Les conducteurs (identité, matricule) ou système automatisé.
+-	Les incidents (date, heure, type, description, localisation).
+-	Les messages d’information voyageurs associés aux perturbations.
+-	Les correspondances entre lignes/stations.
+-	Les centres de maintenance liés aux lignes.
+
+Inspire-toi du site web suivant : https://www.ratp.fr
+Ton entreprise veut appliquer MERISE pour concevoir un système d'information.
+Tu es chargé de la partie analyse, c’est-à-dire de collecter les besoins auprès de l’entreprise.
+Elle a fait appel à un étudiant en ingénierie informatique pour réaliser ce projet, tu dois lui fournir les informations nécessaires pour qu’il applique ensuite lui-même les étapes suivantes de conception et développement de la base de données.
+D’abord, établis les règles de gestion des données de ton entreprise, sous la forme d'une liste à puce. Elle doit correspondre aux informations que fournit quelqu’un qui connaît le fonctionnement de l’entreprise, mais pas comment se construit un système d’informations.
+Ensuite, à partir de ces règles, fournis un dictionnaire de données brutes avec les colonnes suivantes, regroupées dans un tableau : signification de la donnée, type, taille en nombre de caractères ou de chiffres. Il doit y avoir entre 25 et 35 données.
+Il sert à fournir des informations supplémentaires sur chaque donnée (taille et type) mais sans a priori sur comment les données vont être modélisées ensuite.
 Fournis donc les règles de gestion et le dictionnaire de données.
