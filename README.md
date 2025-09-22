@@ -96,4 +96,4 @@ Fournis donc les règles de gestion et le dictionnaire de données.
 
 ## MCD
 
-_Note: Le Modèle Conceptuel de Données (MCD) est fourni dans un fichier séparé avec l'extension .svg ou .png dans ce même répertoire._
+![alt text](mcd.png)
