@@ -1,0 +1,10 @@
+ALTER TABLE LigneMétro ADD CONSTRAINT uq_ligne_nom UNIQUE (nom);
+ALTER TABLE station ADD CONSTRAINT ck_zone_tarifaire CHECK (zonetarrifaire BETWEEN 1 AND 5);
+ALTER TABLE LigneMétro ADD CONSTRAINT ck_horaires_service CHECK (horairededébut < horairedefin);
+ALTER TABLE ramemétro ADD CONSTRAINT ck_capacite_positive CHECK (capacité > 0);
+ALTER TABLE ramemétro ADD CONSTRAINT ck_mode_conduite CHECK (modeconduite IN ('manuel', 'automatique', 'semi-automatique'));
+ALTER TABLE trafic ADD CONSTRAINT ck_trafic_positif CHECK (nbentrée >= 0 AND nbsortie >= 0);
+ALTER TABLE incident ADD CONSTRAINT ck_date_incident CHECK (date_ <= CURDATE());
+ALTER TABLE passe ADD CONSTRAINT ck_ecart_coherent CHECK ((horaireprévu IS NULL OR horaireréel IS NULL) OR (écart = TIMESTAMPDIFF(MINUTE, horaireprévu, horaireréel)));
+ALTER TABLE correspondance ADD CONSTRAINT ck_correspondance_differente CHECK (codeInterne != codeInterne_1);
+ALTER TABLE conducteur ADD CONSTRAINT ck_format_matricule CHECK (matricule REGEXP '^[A-Z]{2}[0-9]{6}$');

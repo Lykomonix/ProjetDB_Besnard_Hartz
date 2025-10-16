@@ -1,4 +1,5 @@
 # Système d'information pour entreprise de transport urbain
+
 **Projet de base de données - Second rendu**
 
 *Clément Besnard & Henri Hartz*
@@ -11,181 +12,65 @@
 
 ### A. MLD
 
-typeLigne = (id INT, nom VARCHAR(50)); <br>
-station = (codeInterne VARCHAR(10), nom VARCHAR(60), zonetarrifaire DECIMAL(1,0)); <br>
-équipement = (nom VARCHAR(30)); <br>
-titredetransport = (id INT, nom VARCHAR(30)); <br>
-conducteur = (matricule VARCHAR(8), nom VARCHAR(30), prénom VARCHAR(30)); <br>
-typeincident = (id INT, nom VARCHAR(30)); <br>
-typemessage = (id VARCHAR(10), label VARCHAR(255)); <br>
-centredemaintenance = (code VARCHAR(10), nom VARCHAR(60), adresse VARCHAR(120)); <br>
-trafic = (id INT, date_ DATE, heure TIME, nbentrée INT, nbsortie INT, #id_1, #codeInterne); <br>
-LigneMétro = (Numéro DECIMAL(2,0), nom VARCHAR(50), horairededébut TIME, horairedefin TIME, #id); <br>
-ramemétro = (id DECIMAL(6,0), capacité DECIMAL(4,0), modeconduite VARCHAR(15), #matricule*, #Numéro); <br>
-incident = (id INT, date_ DATE, heure TIME, description VARCHAR(255), #Numéro*, #codeInterne*, #id_1); <br>
-message = (id INT, contenu VARCHAR(255), date_ DATE, heure TIME, canal VARCHAR(50), #id_1, #id_2); <br>
-dessert = (#Numéro, #codeInterne); <br>
-équipé = (#codeInterne, #nom); <br>
-passe = (#codeInterne, #id, horaireprévu DATETIME, horaireréel DATETIME, écart DECIMAL(3,0)); <br>
-correspondance = (#codeInterne, #codeInterne_1); <br>
-entretien = (#Numéro, #nom, #id, #code); <br>
+typeLigne = (id INT, nom VARCHAR(50)); `<br>`
+station = (codeInterne VARCHAR(10), nom VARCHAR(60), zonetarrifaire DECIMAL(1,0)); `<br>`
+équipement = (nom VARCHAR(30)); `<br>`
+titredetransport = (id INT, nom VARCHAR(30)); `<br>`
+conducteur = (matricule VARCHAR(8), nom VARCHAR(30), prénom VARCHAR(30)); `<br>`
+typeincident = (id INT, nom VARCHAR(30)); `<br>`
+typemessage = (id VARCHAR(10), label VARCHAR(255)); `<br>`
+centredemaintenance = (code VARCHAR(10), nom VARCHAR(60), adresse VARCHAR(120)); `<br>`
+trafic = (id INT, date_ DATE, heure TIME, nbentrée INT, nbsortie INT, #id_1, #codeInterne); `<br>`
+LigneMétro = (Numéro DECIMAL(2,0), nom VARCHAR(50), horairededébut TIME, horairedefin TIME, #id); `<br>`
+ramemétro = (id DECIMAL(6,0), capacité DECIMAL(4,0), modeconduite VARCHAR(15), #matricule*, #Numéro); `<br>`
+incident = (id INT, date_ DATE, heure TIME, description VARCHAR(255), #Numéro*, #codeInterne*, #id_1); `<br>`
+message = (id INT, contenu VARCHAR(255), date_ DATE, heure TIME, canal VARCHAR(50), #id_1, #id_2); `<br>`
+dessert = (#Numéro, #codeInterne); `<br>`
+équipé = (#codeInterne, #nom); `<br>`
+passe = (#codeInterne, #id, horaireprévu DATETIME, horaireréel DATETIME, écart DECIMAL(3,0)); `<br>`
+correspondance = (#codeInterne, #codeInterne_1); `<br>`
+entretien = (#Numéro, #nom, #id, #code); `<br>`
 
 ### B. MPD
 
-CREATE TABLE typeLigne(
-   id INT,
-   nom VARCHAR(50),
-   PRIMARY KEY(id)
-);
+[Voir annexe 1_creation.sql](1_creation.sql)
 
-CREATE TABLE station(
-   codeInterne VARCHAR(10),
-   nom VARCHAR(60),
-   zonetarrifaire DECIMAL(1,0),
-   PRIMARY KEY(codeInterne)
-);
+[Voir annexe 2_contraintes.sql](2_contraintes.sql)
 
-CREATE TABLE équipement(
-   nom VARCHAR(30),
-   PRIMARY KEY(nom)
-);
+## IV. Insertion des données
 
-CREATE TABLE titredetransport(
-   id INT,
-   nom VARCHAR(30) NOT NULL,
-   PRIMARY KEY(id)
-);
+[Voir le prompt utilisé](prompt.txt)
 
-CREATE TABLE conducteur(
-   matricule VARCHAR(8),
-   nom VARCHAR(30),
-   prénom VARCHAR(30),
-   PRIMARY KEY(matricule)
-);
+[Voir annexe 3_insertion.sql](3_insertion.sql)
 
-CREATE TABLE typeincident(
-   id INT,
-   nom VARCHAR(30) NOT NULL,
-   PRIMARY KEY(id)
-);
+## V. Cinquième étape : interrogation de la BD
 
-CREATE TABLE typemessage(
-   id VARCHAR(10),
-   label VARCHAR(255),
-   PRIMARY KEY(id)
-);
+### Scénario d'utilisation de la base de données :
 
-CREATE TABLE centredemaintenance(
-   code VARCHAR(10),
-   nom VARCHAR(60),
-   adresse VARCHAR(120),
-   PRIMARY KEY(code)
-);
+Nous allons construire le scénario d'un personne chargée d'analyser les performances et les qualités de service, puis de faire un rapport de performance pour la direction générale. Son but est donc d'analyser les performances du réseau et d'identifier les axes d'amélioration.
+Pour mener à bien sa mission, il a besoin d'extraire des données clés qui représenteront les indicateurs clés de performance (KPI).
 
-CREATE TABLE trafic(
-   id INT,
-   date_ DATE,
-   heure TIME,
-   nbentrée INT,
-   nbsortie INT,
-   id_1 INT NOT NULL,
-   codeInterne VARCHAR(10) NOT NULL,
-   PRIMARY KEY(id),
-   FOREIGN KEY(id_1) REFERENCES titredetransport(id),
-   FOREIGN KEY(codeInterne) REFERENCES station(codeInterne)
-);
+Voici les principales données à extraire :
 
-CREATE TABLE LigneMétro(
-   Numéro DECIMAL(2,0),
-   nom VARCHAR(50),
-   horairededébut TIME,
-   horairedefin TIME,
-   id INT NOT NULL,
-   PRIMARY KEY(Numéro),
-   FOREIGN KEY(id) REFERENCES typeLigne(id)
-);
+1. Liste des lignes de métro avec leurs horaires, triées par heure de début
+2. Stations de zone tarifaire 1 et 2 avec équipements spécifiques
+3. Conducteurs dont le matricule commence par 'AB' ou 'CD'
+4. Incidents survenus entre 07h00 et 09h00 (heures de pointe du matin)
+5. Rames avec une capacité élevée (plus de 800 voyageurs) et mode automatique
+6. Messages d'information diffusés sur plusieurs canaux spécifiques
+7. Taux de ponctualité moyen par ligne
+8. Nombre d'incidents par type avec durée moyenne
+9. Trafic total par station avec moyenne journalière
+10. Répartition des types de titres de transport
+11. Performance des centres de maintenance (nombre d'interventions par centre)
+12. Incidents avec localisation complète et messages associés
+13. Toutes les stations avec leur trafic (y compris celles sans données)
+14. Rames, conducteurs, lignes et leurs passages récents
+15. Équipements par station avec disponibilité
+16. Messages par type d'incident
+17. Stations avec le trafic le plus élevé
+18. Lignes qui ont eu tous les types d'incidents
+19. Rames qui n'ont eu aucun incident
+20. Stations desservies par plus de lignes que la moyenne
 
-CREATE TABLE ramemétro(
-   id DECIMAL(6,0),
-   capacité DECIMAL(4,0),
-   modeconduite VARCHAR(15),
-   matricule VARCHAR(8),
-   Numéro DECIMAL(2,0) NOT NULL,
-   PRIMARY KEY(id),
-   FOREIGN KEY(matricule) REFERENCES conducteur(matricule),
-   FOREIGN KEY(Numéro) REFERENCES LigneMétro(Numéro)
-);
-
-CREATE TABLE incident(
-   id INT,
-   date_ DATE,
-   heure TIME,
-   description VARCHAR(255),
-   Numéro DECIMAL(2,0),
-   codeInterne VARCHAR(10),
-   id_1 INT NOT NULL,
-   PRIMARY KEY(id),
-   FOREIGN KEY(Numéro) REFERENCES LigneMétro(Numéro),
-   FOREIGN KEY(codeInterne) REFERENCES station(codeInterne),
-   FOREIGN KEY(id_1) REFERENCES typeincident(id)
-);
-
-CREATE TABLE message(
-   id INT,
-   contenu VARCHAR(255),
-   date_ DATE,
-   heure TIME,
-   canal VARCHAR(50),
-   id_1 INT NOT NULL,
-   id_2 VARCHAR(10) NOT NULL,
-   PRIMARY KEY(id),
-   FOREIGN KEY(id_1) REFERENCES incident(id),
-   FOREIGN KEY(id_2) REFERENCES typemessage(id)
-);
-
-CREATE TABLE dessert(
-   Numéro DECIMAL(2,0),
-   codeInterne VARCHAR(10),
-   PRIMARY KEY(Numéro, codeInterne),
-   FOREIGN KEY(Numéro) REFERENCES LigneMétro(Numéro),
-   FOREIGN KEY(codeInterne) REFERENCES station(codeInterne)
-);
-
-CREATE TABLE équipé(
-   codeInterne VARCHAR(10),
-   nom VARCHAR(30),
-   PRIMARY KEY(codeInterne, nom),
-   FOREIGN KEY(codeInterne) REFERENCES station(codeInterne),
-   FOREIGN KEY(nom) REFERENCES équipement(nom)
-);
-
-CREATE TABLE passe(
-   codeInterne VARCHAR(10),
-   id DECIMAL(6,0),
-   horaireprévu DATETIME,
-   horaireréel DATETIME,
-   écart DECIMAL(3,0),
-   PRIMARY KEY(codeInterne, id),
-   FOREIGN KEY(codeInterne) REFERENCES station(codeInterne),
-   FOREIGN KEY(id) REFERENCES ramemétro(id)
-);
-
-CREATE TABLE correspondance(
-   codeInterne VARCHAR(10),
-   codeInterne_1 VARCHAR(10),
-   PRIMARY KEY(codeInterne, codeInterne_1),
-   FOREIGN KEY(codeInterne) REFERENCES station(codeInterne),
-   FOREIGN KEY(codeInterne_1) REFERENCES station(codeInterne)
-);
-
-CREATE TABLE entretien(
-   Numéro DECIMAL(2,0),
-   nom VARCHAR(30),
-   id DECIMAL(6,0),
-   code VARCHAR(10),
-   PRIMARY KEY(Numéro, nom, id, code),
-   FOREIGN KEY(Numéro) REFERENCES LigneMétro(Numéro),
-   FOREIGN KEY(nom) REFERENCES équipement(nom),
-   FOREIGN KEY(id) REFERENCES ramemétro(id),
-   FOREIGN KEY(code) REFERENCES centredemaintenance(code)
-);
+[Voir annexe 4_interrogation.sql](4_interrogation.sql)

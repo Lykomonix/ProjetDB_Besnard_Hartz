@@ -1,0 +1,48 @@
+Tu travailles dans le domaine du transport urbain et de la mobilité.
+Ton entreprise a comme activité de gérer, exploiter et maintenir le réseau de transports publics parisiens, en particulier les lignes de métro, leurs stations, rames et services associés.
+C’est une entreprise de transport en commun comme la RATP ou la SNCF Transilien.
+
+Voici le MLD de la base de données actuelle :
+
+typeLigne = (id INT, nom VARCHAR(50));
+station = (codeInterne VARCHAR(10), nom VARCHAR(60), zonetarrifaire DECIMAL(1,0));
+équipement = (nom VARCHAR(30)); 
+titredetransport = (id INT, nom VARCHAR(30)); 
+conducteur = (matricule VARCHAR(8), nom VARCHAR(30), prénom VARCHAR(30)); 
+typeincident = (id INT, nom VARCHAR(30)); 
+typemessage = (id VARCHAR(10), label VARCHAR(255)); 
+centredemaintenance = (code VARCHAR(10), nom VARCHAR(60), adresse VARCHAR(120)); 
+trafic = (id INT, date_ DATE, heure TIME, nbentrée INT, nbsortie INT, #id_1, #codeInterne); 
+LigneMétro = (Numéro DECIMAL(2,0), nom VARCHAR(50), horairededébut TIME, horairedefin TIME, #id); 
+ramemétro = (id DECIMAL(6,0), capacité DECIMAL(4,0), modeconduite VARCHAR(15), #matricule*, #Numéro); 
+incident = (id INT, date_ DATE, heure TIME, description VARCHAR(255), #Numéro*, #codeInterne*, #id_1); 
+message = (id INT, contenu VARCHAR(255), date_ DATE, heure TIME, canal VARCHAR(50), #id_1, #id_2); 
+dessert = (#Numéro, #codeInterne); 
+équipé = (#codeInterne, #nom); 
+passe = (#codeInterne, #id, horaireprévu DATETIME, horaireréel DATETIME, écart DECIMAL(3,0)); 
+correspondance = (#codeInterne, #codeInterne_1); 
+entretien = (#Numéro, #nom, #id, #code);
+
+Génère 20 lignes d’exemples de données cohérentes pour chaque table du modèle ci-dessus.
+
+Il y a plusieurs contraintes et cohérences à respecter :
+
+- Les clés étrangères (#) doivent correspondre à des valeurs existantes dans les tables référencées.
+(Ex : #id dans LigneMétro doit exister dans typeLigne.)
+- Les horaires et dates doivent être réalistes (ex : horairededébut < horairedefin, horaireréel proche de horaireprévu).
+- Les noms de stations doivent être inspirés de vraies stations parisiennes.
+- Noms de lignes : ex. “Ligne 1 – La Défense / Château de Vincennes”.
+- Équipements : “Escalator”, “Ascenseur”, “Distributeur de tickets”, etc.
+- Titres de transport : “Abonnement Semaine”, “Ticket t+”, “Abonnement Annuel”...
+- Conducteurs : prénoms et noms français réalistes.
+- Types d’incidents : “Panne électrique”, “Incident voyageur”, “Retard matériel”.
+- Types de messages : “Alerte trafic”, “Maintenance prévue”, “Perturbation”.
+- Centres de maintenance : adresses parisiennes plausibles.
+- Les identifiants (id, matricule, codeInterne, etc.) doivent être cohérents en type et format.
+- Les champs numériques (capacités, zones tarifaires, écarts) doivent avoir des valeurs crédibles.
+- Fait attention aux apostrophes, lorsqu'il y en a une mets le champ de texte entre guillemets.
+- Pour chaque table, donne les 20 commandes sql pour ajouter ces données.
+
+Génère 20 lignes cohérentes par table selon les règles ci-dessus.
+Assure la cohérence entre toutes les tables (références croisées valides).
+Utilise un style réaliste, professionnel et structuré.
