@@ -12,24 +12,24 @@
 
 ### A. MLD
 
-typeLigne = (id INT, nom VARCHAR(50)); `<br>`
-station = (codeInterne VARCHAR(10), nom VARCHAR(60), zonetarrifaire DECIMAL(1,0)); `<br>`
-équipement = (nom VARCHAR(30)); `<br>`
-titredetransport = (id INT, nom VARCHAR(30)); `<br>`
-conducteur = (matricule VARCHAR(8), nom VARCHAR(30), prénom VARCHAR(30)); `<br>`
-typeincident = (id INT, nom VARCHAR(30)); `<br>`
-typemessage = (id VARCHAR(10), label VARCHAR(255)); `<br>`
-centredemaintenance = (code VARCHAR(10), nom VARCHAR(60), adresse VARCHAR(120)); `<br>`
-trafic = (id INT, date_ DATE, heure TIME, nbentrée INT, nbsortie INT, #id_1, #codeInterne); `<br>`
-LigneMétro = (Numéro DECIMAL(2,0), nom VARCHAR(50), horairededébut TIME, horairedefin TIME, #id); `<br>`
-ramemétro = (id DECIMAL(6,0), capacité DECIMAL(4,0), modeconduite VARCHAR(15), #matricule*, #Numéro); `<br>`
-incident = (id INT, date_ DATE, heure TIME, description VARCHAR(255), #Numéro*, #codeInterne*, #id_1); `<br>`
-message = (id INT, contenu VARCHAR(255), date_ DATE, heure TIME, canal VARCHAR(50), #id_1, #id_2); `<br>`
-dessert = (#Numéro, #codeInterne); `<br>`
-équipé = (#codeInterne, #nom); `<br>`
-passe = (#codeInterne, #id, horaireprévu DATETIME, horaireréel DATETIME, écart DECIMAL(3,0)); `<br>`
-correspondance = (#codeInterne, #codeInterne_1); `<br>`
-entretien = (#Numéro, #nom, #id, #code); `<br>`
+typeLigne = (**id INT**, nom VARCHAR(50)); <br>
+station = (**codeInterne VARCHAR(10)**, nom VARCHAR(60), zonetarrifaire DECIMAL(1,0)); <br>
+équipement = (**nom VARCHAR(30)**); <br>
+titredetransport = (**id INT**, nom VARCHAR(30)); <br>
+conducteur = (**matricule VARCHAR(8)**, nom VARCHAR(30), prénom VARCHAR(30)); <br>
+typeincident = (**id INT**, nom VARCHAR(30)); <br>
+typemessage = (**id VARCHAR(10)**, label VARCHAR(255)); <br>
+centredemaintenance = (**code VARCHAR(10)**, nom VARCHAR(60), adresse VARCHAR(120)); <br>
+trafic = (**id INT**, date_ DATE, heure TIME, nbentrée INT, nbsortie INT, #id_1, #codeInterne); <br>
+LigneMétro = (**Numéro DECIMAL(2,0)*, nom VARCHAR(50), horairededébut TIME, horairedefin TIME, #id); <br>
+ramemétro = (**id DECIMAL(6,0)**, capacité DECIMAL(4,0), modeconduite VARCHAR(15), #matricule*, #Numéro); <br>
+incident = (**id INT**, date_ DATE, heure TIME, description VARCHAR(255), #Numéro*, #codeInterne*, #id_1); <br>
+message = (**id INT**, contenu VARCHAR(255), date_ DATE, heure TIME, canal VARCHAR(50), #id_1, #id_2); <br>
+dessert = (**#Numéro, #codeInterne**); <br>
+équipé = (**#codeInterne, #nom**); <br>
+passe = (**#codeInterne, #id**, horaireprévu DATETIME, horaireréel DATETIME, écart DECIMAL(3,0)); <br>
+correspondance = (**#codeInterne, #codeInterne_1**); <br>
+entretien = (**#Numéro, #nom, #id, #code**); <br>
 
 ### B. MPD
 
