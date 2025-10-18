@@ -5,13 +5,13 @@ WHERE horairededébut BETWEEN '05:00:00' AND '06:30:00'
 ORDER BY horairededébut ASC;
 
 -- Requête 2 : Stations de zone tarifaire 1 et 2 avec équipements spécifiques
-SELECT DISTINCT s.nom, s.zonetarrifaire, e.nom AS equipement
-FROM station s
-INNER JOIN équipé eq ON s.codeInterne = eq.codeInterne
-INNER JOIN équipement e ON eq.nom = e.nom
-WHERE s.zonetarrifaire IN (1, 2) 
-AND e.nom LIKE '%ascenseur%' OR e.nom LIKE '%escalator%'
-ORDER BY s.zonetarrifaire, s.nom;
+SELECT DISTINCT station.nom, station.zonetarrifaire, équipement.nom
+FROM station
+INNER JOIN équipé ON station.codeInterne = équipé.codeInterne
+INNER JOIN équipement ON équipé.nom = équipement.nom
+WHERE station.zonetarrifaire IN (1, 2) 
+AND (équipement.nom LIKE '%ascenseur%' OR équipement.nom LIKE '%escalator%')
+ORDER BY station.zonetarrifaire, station.nom;
 
 -- Requête 3 : Conducteurs dont le matricule commence par 'AB' ou 'CD'
 SELECT matricule, nom, prénom
@@ -26,10 +26,10 @@ WHERE heure BETWEEN '07:00:00' AND '09:00:00'
 AND date_ >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
 ORDER BY date_ DESC, heure ASC;
 
--- Requête 5 : Rames avec une capacité élevée (plus de 800 voyageurs) et mode automatique
+-- Requête 5 : Rames avec une capacité élevée (plus de 700 voyageurs) et mode automatique
 SELECT DISTINCT id, capacité, modeconduite, Numéro
 FROM ramemétro
-WHERE capacité > 800 
+WHERE capacité > 700 
 AND modeconduite IN ('automatique', 'semi-automatique')
 ORDER BY capacité DESC;
 
@@ -40,143 +40,143 @@ WHERE canal IN ('affichage_station', 'application_mobile', 'annonce_sonore')
 AND date_ BETWEEN DATE_SUB(CURDATE(), INTERVAL 7 DAY) AND CURDATE()
 ORDER BY date_ DESC, heure DESC;
 
--- Requête 7 : Taux de ponctualité moyen par ligne (écart ≤ 2 minutes = ponctuel)
-SELECT lm.Numéro, lm.nom,
-       COUNT(*) as total_passages,
-       COUNT(CASE WHEN ABS(p.écart) <= 2 THEN 1 END) as passages_ponctuels,
-       ROUND((COUNT(CASE WHEN ABS(p.écart) <= 2 THEN 1 END) * 100.0 / COUNT(*)), 2) as taux_ponctualite
-FROM LigneMétro lm
-INNER JOIN ramemétro rm ON lm.Numéro = rm.Numéro
-INNER JOIN passe p ON rm.id = p.id
-WHERE p.horaireprévu >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
-GROUP BY lm.Numéro, lm.nom
-HAVING COUNT(*) > 100
+-- Requête 7 : Taux de ponctualité moyen par ligne
+SELECT LigneMétro.Numéro,
+       LigneMétro.nom,
+       COUNT(*) AS total_passages,
+       SUM(CASE WHEN ABS(passe.`écart`) <= 2 THEN 1 ELSE 0 END) AS passages_ponctuels,
+       ROUND(SUM(CASE WHEN ABS(passe.`écart`) <= 2 THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 2) AS taux_ponctualite
+FROM LigneMétro
+JOIN ramemétro ON LigneMétro.Numéro = ramemétro.Numéro
+JOIN passe ON ramemétro.id = passe.id
+WHERE passe.horaireprévu >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+GROUP BY LigneMétro.Numéro, LigneMétro.nom
+HAVING COUNT(*) > 0
 ORDER BY taux_ponctualite DESC;
 
 -- Requête 8 : Nombre d'incidents par type avec durée moyenne (calculée approximativement)
-SELECT ti.nom as type_incident,
-       COUNT(i.id) as nombre_incidents,
-       AVG(CASE WHEN i.heure IS NOT NULL THEN 1 ELSE 0 END) as incidents_avec_heure,
-       ROUND(AVG(HOUR(i.heure) + MINUTE(i.heure)/60.0), 2) as heure_moyenne_occurrence
-FROM typeincident ti
-INNER JOIN incident i ON ti.id = i.id_1
-WHERE i.date_ >= DATE_SUB(CURDATE(), INTERVAL 90 DAY)
-GROUP BY ti.id, ti.nom
-HAVING COUNT(i.id) >= 5
+SELECT typeincident.nom AS type_incident,
+       COUNT(incident.id) AS nombre_incidents,
+       COUNT(incident.heure) AS incidents_avec_heure,
+       ROUND(AVG(CASE WHEN incident.heure IS NOT NULL THEN TIME_TO_SEC(incident.heure) END)) AS avg_seconds,
+       SEC_TO_TIME(ROUND(AVG(CASE WHEN incident.heure IS NOT NULL THEN TIME_TO_SEC(incident.heure) END))) AS heure_moyenne_occurrence
+FROM typeincident
+JOIN incident ON typeincident.id = incident.id_1
+WHERE incident.date_ >= DATE_SUB(CURDATE(), INTERVAL 90 DAY)
+GROUP BY typeincident.id, typeincident.nom
 ORDER BY nombre_incidents DESC;
 
--- Requête 9 : Trafic total par station avec moyenne journalière
-SELECT s.nom, s.zonetarrifaire,
-       SUM(t.nbentrée) as total_entrees,
-       SUM(t.nbsortie) as total_sorties,
-       SUM(t.nbentrée + t.nbsortie) as trafic_total,
-       ROUND(AVG(t.nbentrée + t.nbsortie), 0) as moyenne_journaliere
-FROM station s
-INNER JOIN trafic t ON s.codeInterne = t.codeInterne
-WHERE t.date_ >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
-GROUP BY s.codeInterne, s.nom, s.zonetarrifaire
-HAVING SUM(t.nbentrée + t.nbsortie) > 10000
+-- Requête 9 : Trafic total par station
+SELECT station.nom, station.zonetarrifaire,
+       SUM(trafic.nbentrée) as total_entrees,
+       SUM(trafic.nbsortie) as total_sorties,
+       SUM(trafic.nbentrée + trafic.nbsortie) as trafic_total
+FROM station
+INNER JOIN trafic ON station.codeInterne = trafic.codeInterne
+WHERE trafic.date_ >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+GROUP BY station.codeInterne, station.nom, station.zonetarrifaire
+HAVING SUM(trafic.nbentrée + trafic.nbsortie) > 0
 ORDER BY trafic_total DESC;
 
 -- Requête 10 : Répartition des types de titres de transport
-SELECT tt.nom as titre_transport,
-       COUNT(t.id) as nombre_utilisations,
-       SUM(t.nbentrée + t.nbsortie) as voyageurs_totaux,
-       ROUND(AVG(t.nbentrée + t.nbsortie), 2) as moyenne_par_utilisation
-FROM titredetransport tt
-INNER JOIN trafic t ON tt.id = t.id_1
-WHERE t.date_ >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
-GROUP BY tt.id, tt.nom
-HAVING COUNT(t.id) > 50
+SELECT titredetransport.nom as titre_transport,
+       COUNT(trafic.id) as nombre_utilisations,
+       SUM(trafic.nbentrée + trafic.nbsortie) as voyageurs_totaux,
+       ROUND(AVG(trafic.nbentrée + trafic.nbsortie), 2) as moyenne_par_utilisation
+FROM titredetransport
+INNER JOIN trafic ON titredetransport.id = trafic.id_1
+WHERE trafic.date_ >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+GROUP BY titredetransport.id, titredetransport.nom
+HAVING COUNT(trafic.id) > 0
 ORDER BY voyageurs_totaux DESC;
 
 -- Requête 11 : Performance des centres de maintenance (nombre d'interventions par centre)
-SELECT cm.nom as centre_maintenance, cm.code,
-       COUNT(DISTINCT e.Numéro) as lignes_entretenues,
-       COUNT(DISTINCT e.id) as rames_entretenues,
+SELECT centredemaintenance.nom as centre_maintenance, centredemaintenance.code,
+       COUNT(DISTINCT entretien.Numéro) as lignes_entretenues,
+       COUNT(DISTINCT entretien.id) as rames_entretenues,
        COUNT(*) as total_interventions
-FROM centredemaintenance cm
-INNER JOIN entretien e ON cm.code = e.code
-GROUP BY cm.code, cm.nom
-HAVING COUNT(*) >= 10
+FROM centredemaintenance
+INNER JOIN entretien ON centredemaintenance.code = entretien.code
+GROUP BY centredemaintenance.code, centredemaintenance.nom
+HAVING COUNT(*) >= 0
 ORDER BY total_interventions DESC;
 
 -- Requête 12 : Jointure multiple - Incidents avec localisation complète et messages associés
-SELECT i.id, i.date_, i.heure, i.description,
-       lm.nom as ligne, s.nom as station,
-       ti.nom as type_incident,
-       m.contenu as message_diffuse, m.canal
-FROM incident i
-INNER JOIN typeincident ti ON i.id_1 = ti.id
-LEFT JOIN LigneMétro lm ON i.Numéro = lm.Numéro
-LEFT JOIN station s ON i.codeInterne = s.codeInterne
-LEFT JOIN message m ON i.id = m.id_1
-WHERE i.date_ >= DATE_SUB(CURDATE(), INTERVAL 15 DAY)
-ORDER BY i.date_ DESC, i.heure DESC;
+SELECT incident.id, incident.date_, incident.heure, incident.description,
+       LigneMétro.nom as ligne, station.nom as station,
+       typeincident.nom as type_incident,
+       message.contenu as message_diffuse, message.canal
+FROM incident
+INNER JOIN typeincident ON incident.id_1 = typeincident.id
+LEFT JOIN LigneMétro ON incident.Numéro = LigneMétro.Numéro
+LEFT JOIN station ON incident.codeInterne = station.codeInterne
+LEFT JOIN message ON incident.id = message.id_1
+WHERE incident.date_ >= DATE_SUB(CURDATE(), INTERVAL 15 DAY)
+ORDER BY incident.date_ DESC, incident.heure DESC;
 
 -- Requête 13 : Jointure externe - Toutes les stations avec leur trafic (y compris celles sans données)
-SELECT s.nom, s.zonetarrifaire, s.codeInterne,
-       COALESCE(SUM(t.nbentrée), 0) as total_entrees,
-       COALESCE(SUM(t.nbsortie), 0) as total_sorties,
-       COALESCE(COUNT(t.id), 0) as nb_mesures
-FROM station s
-LEFT JOIN trafic t ON s.codeInterne = t.codeInterne 
-    AND t.date_ >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
-GROUP BY s.codeInterne, s.nom, s.zonetarrifaire
+SELECT station.nom, station.zonetarrifaire, station.codeInterne,
+       COALESCE(SUM(trafic.nbentrée), 0) as total_entrees,
+       COALESCE(SUM(trafic.nbsortie), 0) as total_sorties,
+       COALESCE(COUNT(trafic.id), 0) as nb_mesures
+FROM station
+LEFT JOIN trafic ON station.codeInterne = trafic.codeInterne
+    AND trafic.date_ >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+GROUP BY station.codeInterne, station.nom, station.zonetarrifaire
 ORDER BY total_entrees DESC;
 
 -- Requête 14 : Jointure complexe - Rames, conducteurs, lignes et leurs passages récents
-SELECT rm.id as rame_id, rm.capacité, rm.modeconduite,
-       c.nom as conducteur_nom, c.prénom as conducteur_prenom,
-       lm.nom as ligne_nom,
-       COUNT(p.codeInterne) as nb_passages_recents,
-       AVG(p.écart) as ecart_moyen
-FROM ramemétro rm
-LEFT JOIN conducteur c ON rm.matricule = c.matricule
-INNER JOIN LigneMétro lm ON rm.Numéro = lm.Numéro
-LEFT JOIN passe p ON rm.id = p.id 
-    AND p.horaireprévu >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
-GROUP BY rm.id, rm.capacité, rm.modeconduite, c.nom, c.prénom, lm.nom
+SELECT ramemétro.id as rame_id, ramemétro.capacité, ramemétro.modeconduite,
+       conducteur.nom as conducteur_nom, conducteur.prénom as conducteur_prenom,
+       LigneMétro.nom as ligne_nom,
+       COUNT(passe.codeInterne) as nb_passages_recents,
+       AVG(passe.écart) as ecart_moyen
+FROM ramemétro
+LEFT JOIN conducteur ON ramemétro.matricule = conducteur.matricule
+INNER JOIN LigneMétro ON ramemétro.Numéro = LigneMétro.Numéro
+LEFT JOIN passe ON ramemétro.id = passe.id
+    AND passe.horaireprévu >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+GROUP BY ramemétro.id, ramemétro.capacité, ramemétro.modeconduite, conducteur.nom, conducteur.prénom, LigneMétro.nom
 ORDER BY nb_passages_recents DESC;
 
 -- Requête 15 : Jointure externe - Équipements par station avec disponibilité
-SELECT s.nom as station, s.zonetarrifaire,
-       GROUP_CONCAT(e.nom SEPARATOR ', ') as equipements_disponibles,
-       COUNT(eq.nom) as nb_equipements
-FROM station s
-LEFT JOIN équipé eq ON s.codeInterne = eq.codeInterne
-LEFT JOIN équipement e ON eq.nom = e.nom
-GROUP BY s.codeInterne, s.nom, s.zonetarrifaire
-ORDER BY nb_equipements DESC, s.nom;
+SELECT station.nom as station, station.zonetarrifaire,
+       GROUP_CONCAT(équipement.nom SEPARATOR ', ') as equipements_disponibles,
+       COUNT(équipé.nom) as nb_equipements
+FROM station
+LEFT JOIN équipé ON station.codeInterne = équipé.codeInterne
+LEFT JOIN équipement ON équipé.nom = équipement.nom
+GROUP BY station.codeInterne, station.nom, station.zonetarrifaire
+ORDER BY nb_equipements DESC, station.nom;
 
 -- Requête 16 : Jointure multiple avec agrégation - Messages par type d'incident
-SELECT ti.nom as type_incident,
-       tm.label as type_message,
-       COUNT(m.id) as nb_messages,
-       COUNT(DISTINCT i.id) as nb_incidents_distincts,
-       GROUP_CONCAT(DISTINCT m.canal SEPARATOR ', ') as canaux_utilises
-FROM typeincident ti
-INNER JOIN incident i ON ti.id = i.id_1
-INNER JOIN message m ON i.id = m.id_1
-INNER JOIN typemessage tm ON m.id_2 = tm.id
-WHERE i.date_ >= DATE_SUB(CURDATE(), INTERVAL 60 DAY)
-GROUP BY ti.nom, tm.label
+SELECT typeincident.nom as type_incident,
+       typemessage.label as type_message,
+       COUNT(message.id) as nb_messages,
+       COUNT(DISTINCT incident.id) as nb_incidents_distincts,
+       GROUP_CONCAT(DISTINCT message.canal SEPARATOR ', ') as canaux_utilises
+FROM typeincident
+INNER JOIN incident ON typeincident.id = incident.id_1
+INNER JOIN message ON incident.id = message.id_1
+INNER JOIN typemessage ON message.id_2 = typemessage.id
+WHERE incident.date_ >= DATE_SUB(CURDATE(), INTERVAL 60 DAY)
+GROUP BY typeincident.nom, typemessage.label
 ORDER BY nb_messages DESC;
 
 -- Requête 17 : Stations avec le trafic le plus élevé (IN avec sous-requête)
-SELECT s.nom, s.zonetarrifaire, 
-       (SELECT SUM(t.nbentrée + t.nbsortie) 
-        FROM trafic t 
-        WHERE t.codeInterne = s.codeInterne 
-        AND t.date_ >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)) as trafic_total
-FROM station s
-WHERE s.codeInterne IN (
-    SELECT t.codeInterne
-    FROM trafic t
-    WHERE t.date_ >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
-    GROUP BY t.codeInterne
-    HAVING SUM(t.nbentrée + t.nbsortie) > (
-        SELECT AVG(total_trafic) * 1.5
+SELECT station.nom, station.zonetarrifaire, 
+       (SELECT SUM(trafic.nbentrée + trafic.nbsortie) 
+        FROM trafic
+        WHERE trafic.codeInterne = station.codeInterne 
+        AND trafic.date_ >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)) as trafic_total
+FROM station
+WHERE station.codeInterne IN (
+    SELECT trafic.codeInterne
+    FROM trafic
+    WHERE trafic.date_ >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+    GROUP BY trafic.codeInterne
+    HAVING SUM(trafic.nbentrée + trafic.nbsortie) > (
+        SELECT AVG(total_trafic) * 1.3
         FROM (
             SELECT SUM(nbentrée + nbsortie) as total_trafic
             FROM trafic
@@ -188,36 +188,36 @@ WHERE s.codeInterne IN (
 ORDER BY trafic_total DESC;
 
 -- Requête 18 : Lignes qui ont eu TOUS les types d'incidents (ALL)
-SELECT lm.Numéro, lm.nom
-FROM LigneMétro lm
+SELECT LigneMétro.Numéro, LigneMétro.nom
+FROM LigneMétro
 WHERE NOT EXISTS (
-    SELECT ti.id
-    FROM typeincident ti
+    SELECT typeincident.id
+    FROM typeincident
     WHERE NOT EXISTS (
         SELECT 1
-        FROM incident i
-        WHERE i.Numéro = lm.Numéro 
-        AND i.id_1 = ti.id
-        AND i.date_ >= DATE_SUB(CURDATE(), INTERVAL 365 DAY)
+        FROM incident
+        WHERE incident.Numéro = LigneMétro.Numéro
+        AND incident.id_1 = typeincident.id
+        AND incident.date_ >= DATE_SUB(CURDATE(), INTERVAL 365 DAY)
     )
 );
 
 -- Requête 19 : Rames qui n'ont eu AUCUN incident (NOT EXISTS)
-SELECT rm.id, rm.capacité, lm.nom as ligne
-FROM ramemétro rm
-INNER JOIN LigneMétro lm ON rm.Numéro = lm.Numéro
+SELECT ramemétro.id, ramemétro.capacité, LigneMétro.nom as ligne
+FROM ramemétro
+INNER JOIN LigneMétro ON ramemétro.Numéro = LigneMétro.Numéro
 WHERE NOT EXISTS (
     SELECT 1
-    FROM incident i
-    WHERE i.Numéro = rm.Numéro
+    FROM incident
+    WHERE incident.Numéro = ramemétro.Numéro
     AND i.date_ >= DATE_SUB(CURDATE(), INTERVAL 90 DAY)
 );
 
 -- Requête 20 : Stations desservies par plus de lignes que la moyenne (ANY)
-SELECT s.nom, s.zonetarrifaire,
-       (SELECT COUNT(*) FROM dessert d WHERE d.codeInterne = s.codeInterne) as nb_lignes
-FROM station s
-WHERE (SELECT COUNT(*) FROM dessert d WHERE d.codeInterne = s.codeInterne) > ANY (
+SELECT station.nom, station.zonetarrifaire,
+       (SELECT COUNT(*) FROM dessert WHERE dessert.codeInterne = station.codeInterne) as nb_lignes
+FROM station
+WHERE (SELECT COUNT(*) FROM dessert WHERE dessert.codeInterne = station.codeInterne) > ANY (
     SELECT AVG(ligne_count)
     FROM (
         SELECT COUNT(*) as ligne_count

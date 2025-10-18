@@ -29,7 +29,10 @@ Il y a plusieurs contraintes et cohérences à respecter :
 
 - Les clés étrangères (#) doivent correspondre à des valeurs existantes dans les tables référencées.
 (Ex : #id dans LigneMétro doit exister dans typeLigne.)
-- Les horaires et dates doivent être réalistes (ex : horairededébut < horairedefin, horaireréel proche de horaireprévu).
+- Les horaires et dates de la table LigneMétro doivent être réalistes (ex : horairededébut < horairedefin, dans la même journée pour une cohérence des contraintes donc pas de horairedefin après 23:50:00).
+- Le codeinterne fait maximum 10 caractères.
+- Le format du matricule conducteur est 2 lettres puis 6 chiffes obligatoirement.
+- Le modeconduite est soit manuel, automatique, semi-automatique.
 - Les noms de stations doivent être inspirés de vraies stations parisiennes.
 - Noms de lignes : ex. “Ligne 1 – La Défense / Château de Vincennes”.
 - Équipements : “Escalator”, “Ascenseur”, “Distributeur de tickets”, etc.
